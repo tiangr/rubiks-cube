@@ -19,6 +19,6 @@ After camera is turned on and the application is loaded, user can immediately st
    - First kind of rotation is obviously face rotation. To rotate the face, you can make a swipe gesture (quickly move your hand in one direction). This works in both ways.
    - Second kind of rotation is rotation of the whole cube. You can rotate the cube around, so you can see the current state it's in at the given moment. To do so, you can make a "fist" gesture and move your hand around. Once you "release" the cube (read: extend your hand) the cube will stop rotating.
 
-<video src="demo.mp4" controls="controls" style="max-width: 100%;">
-  Your browser does not support the video tag.
-</video>
+### Demo Video
+
+[Watch the demo video](demo.mp4)
