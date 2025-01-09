@@ -21,4 +21,4 @@ After camera is turned on and the application is loaded, user can immediately st
 
 ### Demo Video
 
-[Download and Watch the Demo Video](https://github.com/tiangr/rubiks-cube/releases/tag/release/demo.mp4)
+[![Watch the video]](https://raw.githubusercontent.com/tiangr/rubiks-cube/main/demo.mp4)
