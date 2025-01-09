@@ -27,8 +27,14 @@ function setupMediaPipe() {
     minTrackingConfidence: 0.5,
   });
 
+  let handDetectionReady = false; // Track if hand detection is ready
+
   handDetector.onResults((results) => {
     landmarks = results.multiHandLandmarks[0] || [];
+    if (!handDetectionReady && landmarks) {
+      handDetectionReady = true; // Mark hand detection as ready
+      hideLoadingScreen(); // Hide loading screen once hand detection works
+    }
   });
 
   const camera = new Camera(videoElement, {
@@ -38,12 +44,27 @@ function setupMediaPipe() {
     width: 320,
     height: 240,
   });
-  // Start the camera and hide the loading screen once ready
+
   camera.start().then(() => {
-    isLoading = false;
-    document.getElementById("loadingScreen").style.display = "none"; // Hide loading screen
+    console.log("Camera started.");
   });
+
+  // Fallback in case the hand detection doesn't work quickly
+  const loadingTimeout = setTimeout(() => {
+    if (!handDetectionReady) {
+      console.warn("Loading timeout. Hiding screen anyway.");
+      hideLoadingScreen();
+    }
+  }, 5000); // Adjust timeout as necessary
 }
+
+function hideLoadingScreen() {
+  if (isLoading) {
+    isLoading = false;
+    document.getElementById("loadingScreen").style.display = "none";
+  }
+}
+
 
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL); // Make the canvas full screen
@@ -62,7 +83,6 @@ function setup() {
   setupMediaPipe();
 
   rubikCube = new RubikCube(cubeSize, spacing); // Initialize the Rubik's Cube
-  printCubeState(); // Log the initial state of the Rubik's Cube
 }
 
 // Adjust the canvas size when the window is resized
@@ -175,6 +195,9 @@ function toggleAxis() {
 
 let pinchActive = false; // Track if pinch is active
 let rockNRollActive = false;
+let thumbsUpStartTime = null;
+const thumbsUpHoldDuration = 500;
+let isThumbsUp = false;
 function detectGesture(landmarks) {
   if (!landmarks || landmarks.length < 21) return;
 
@@ -237,15 +260,23 @@ function detectGesture(landmarks) {
   const ringCurled = !isFingerExtended(16, 15);   // Ring finger curled
 
   // Check for "thumb's up" gesture
-  if (
+  const isThumbsUp =
     thumbExtended &&
     !indexExtended &&
     middleCurled &&
     ringCurled &&
-    !pinkyExtended
-  ) {
-    console.log("Thumb's Up detected!");
-    rubikCube.scramble(40); // Scramble the cube with 40 random moves
+    !pinkyExtended;
+
+  if (isThumbsUp) {
+    if (thumbsUpStartTime === null) {
+      thumbsUpStartTime = millis(); // Start the timer
+    } else if (millis() - thumbsUpStartTime > thumbsUpHoldDuration) {
+      console.log("Thumb's Up detected!");
+      rubikCube.scramble(40); // Scramble the cube with 40 random moves
+      thumbsUpStartTime = null; // Reset timer after detection
+    }
+  } else {
+    thumbsUpStartTime = null; // Reset timer if thumbs-up is no longer shown
   }
 
   // Check for Rock 'n' Roll gesture
@@ -574,7 +605,6 @@ rotateFace(layer, axis, clockwise = true) {
 
   // Debug: Log cube state after rotation
   this.startAnimation(layer, axis, clockwise);
-  printCubeState();
 }
 
 
@@ -748,54 +778,7 @@ function controlCubeWithHand(landmarks) {
 let selectedAxis = null; // Variable to store the selected axis
 let selectedLayer = 0; // Variable to store the selected row/column
 
-function keyPressed() {
-  console.log(`Key pressed: ${key}`);
-  
-  switch (key.toUpperCase()) {
-    case 'X': // Select the X-axis
-      selectedAxis = 'x';
-      console.log("Axis selected: X");
-      break;
-    case 'Y': // Select the Y-axis
-      selectedAxis = 'y';
-      console.log("Axis selected: Y");
-      break;
-    case 'Z': // Select the Z-axis
-      selectedAxis = 'z';
-      console.log("Axis selected: Z");
-      break;
-    case 'R': // Rotate along the selected axis (clockwise)
-      if (!selectedAxis) {
-        console.log("No axis selected! Press X, Y, or Z to select an axis.");
-        return;
-      }
-      console.log(`Rotating layer ${selectedLayer} along axis: ${selectedAxis} (clockwise)`);
-      rotateSelectedLayer(selectedAxis, selectedLayer, true); // Clockwise
-      break;
-    case 'L': // Rotate along the selected axis (counterclockwise)
-      if (!selectedAxis) {
-        console.log("No axis selected! Press X, Y, or Z to select an axis.");
-        return;
-      }
-      console.log(`Rotating layer ${selectedLayer} along axis: ${selectedAxis} (counterclockwise)`);
-      rotateSelectedLayer(selectedAxis, selectedLayer, false); // Counterclockwise
-      break;
-    case 'ARROWLEFT': // Select the previous row/column
-      selectedLayer = (selectedLayer - 1 + rubikCube.size) % rubikCube.size;
-      console.log(`Selected layer: ${selectedLayer}`);
-      break;
-    case 'ARROWRIGHT': // Select the next row/column
-      selectedLayer = (selectedLayer + 1) % rubikCube.size;
-      console.log(`Selected layer: ${selectedLayer}`);
-      break;
 
-    case 'S': // Scramble the cube
-      rubikCube.scramble(40); // Perform 20 random moves
-      break;
-    default:
-      console.log(`No action mapped for key: ${key}`);
-  }
-}
 
 
 // Helper function to rotate the selected layer along the selected axis
@@ -803,48 +786,4 @@ function rotateSelectedLayer(axis, layer, clockwise) {
   rubikCube.rotateFace(layer, axis, clockwise);
 }
 
-function printCubeState() {
-  const faces = ["front", "back", "top", "bottom", "right", "left"];
-  const faceColors = { front: [], back: [], top: [], bottom: [], right: [], left: [] };
 
-  rubikCube.grid.forEach((col, x) => {
-    col.forEach((row, y) => {
-      row.forEach((cubie, z) => {
-        const cubieColors = cubie.colors;
-
-        // Assign colors to the respective faces
-        if (z === 2) faceColors.front.push(cubieColors[0]); // Front
-        if (z === 0) faceColors.back.push(cubieColors[1]);  // Back
-        if (y === 0) faceColors.top.push(cubieColors[2]);   // Top
-        if (y === 2) faceColors.bottom.push(cubieColors[3]);// Bottom
-        if (x === 2) faceColors.left.push(cubieColors[5]); // left
-        if (x === 0) faceColors.right.push(cubieColors[4]);  // right
-        
-      });
-    });
-  });
-
-  const mapColorToName = (clr) => {
-    if (clr.levels[0] === 255 && clr.levels[1] === 0 && clr.levels[2] === 0) return "RED";
-    if (clr.levels[0] === 0 && clr.levels[1] === 255 && clr.levels[2] === 0) return "GREEN";
-    if (clr.levels[0] === 0 && clr.levels[1] === 0 && clr.levels[2] === 255) return "BLUE";
-    if (clr.levels[0] === 255 && clr.levels[1] === 255 && clr.levels[2] === 0) return "YELLOW";
-    if (clr.levels[0] === 255 && clr.levels[1] === 165 && clr.levels[2] === 0) return "ORANGE";
-    if (clr.levels[0] === 255 && clr.levels[1] === 255 && clr.levels[2] === 255) return "WHITE";
-    return "UNKNOWN";
-  };
-
-  // Print the colors for each face in a readable format
-  faces.forEach((face) => {
-    console.log(`${face} face:`);
-    const rows = [];
-    for (let i = 0; i < 3; i++) {
-      rows.push(
-        faceColors[face]
-          .slice(i * 3, i * 3 + 3)
-          .map((c) => mapColorToName(c))
-      );
-    }
-    rows.forEach((row) => console.log(row));
-  });
-}
