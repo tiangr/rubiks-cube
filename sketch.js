@@ -55,7 +55,7 @@ function setupMediaPipe() {
       console.warn("Loading timeout. Hiding screen anyway.");
       hideLoadingScreen();
     }
-  }, 5000); // Adjust timeout as necessary
+  }, 5000);
 }
 
 function hideLoadingScreen() {
@@ -110,7 +110,7 @@ function draw() {
     drawHandLandmarks(landmarks);
 
     if (fistDetected) {
-      console.log("Fist detected!"); // Debug log
+      //console.log("Fist detected!");
       controlCubeWithHand(landmarks);
     } else {
       updateLastHandPosition(landmarks[0]);
@@ -193,7 +193,7 @@ function toggleAxis() {
   console.log(`Axis selected: ${selectedAxis}`);
 }
 
-let pinchActive = false; // Track if pinch is active
+let pinchActive = false; 
 let rockNRollActive = false;
 let thumbsUpStartTime = null;
 const thumbsUpHoldDuration = 500;
@@ -226,7 +226,7 @@ function detectGesture(landmarks) {
   const indexTip = landmarks[8];
   const pinchDistance = normalizedDistance(thumbTip, indexTip);
 
-  if (pinchDistance < 0.2) { // Adjust normalized threshold
+  if (pinchDistance < 0.2) { 
     if (!pinchActive) {
       console.log("Pinch detected!");
       toggleAxis();
@@ -272,7 +272,7 @@ function detectGesture(landmarks) {
       thumbsUpStartTime = millis(); // Start the timer
     } else if (millis() - thumbsUpStartTime > thumbsUpHoldDuration) {
       console.log("Thumb's Up detected!");
-      rubikCube.scramble(40); // Scramble the cube with 40 random moves
+      rubikCube.scramble(40); // Scramble the cube
       thumbsUpStartTime = null; // Reset timer after detection
     }
   } else {
@@ -354,9 +354,6 @@ function detectSwipe(landmarks) {
   lastHandPosition = avgPosition;
 }
 
-
-
-
 function updateLastHandPosition(wristPosition) {
   lastHandPosition = { x: wristPosition.x, y: wristPosition.y };
 }
@@ -378,7 +375,6 @@ function drawHandLandmarks(landmarks) {
     videoCtx.stroke();
   });
 }
-
 
 
 class RubikCube {
@@ -425,10 +421,10 @@ class RubikCube {
       // Proceed to the next move after a delay
       moveIndex++;
       console.log(`Move ${moveIndex}/${moves}`);
-      setTimeout(performMove, 100); // Adjust delay as needed (500ms here)
+      setTimeout(performMove, 100); 
     };
 
-    performMove(); // Start the scrambling process
+    performMove();
   }
   
 
@@ -539,7 +535,7 @@ class RubikCube {
   
     for (let i = 0; i < size; i++) {
       for (let j = 0; j < size; j++) {
-        // Correct rotation logic for clockwise and counterclockwise
+        // Perform rotation based on the selected axis
         if (clockwise) {
           rotated[j][size - 1 - i] = slice[i][j]; // Clockwise transformation
         } else {
@@ -554,12 +550,6 @@ class RubikCube {
   
     return rotated;
   }
-  
-  
-  
-  
-  
-  
   
   updateSlice(rotatedSlice, layer, axis) {
     if (axis === "x") {
@@ -607,8 +597,6 @@ rotateFace(layer, axis, clockwise = true) {
   this.startAnimation(layer, axis, clockwise);
 }
 
-
-
   startAnimation(layer, axis, clockwise) {
     this.animation = { layer, axis, clockwise };
     this.animationProgress = 0;
@@ -635,15 +623,7 @@ rotateFace(layer, axis, clockwise = true) {
       this.interpolateSlice();
     }
   }
-  
-  
-  
-  
-  
-  
-  
 }
-
 
 class Cubie {
   constructor(x, y, z, size) {
@@ -682,11 +662,6 @@ class Cubie {
   
     this.colors = newColors;
   }
-  
-  
-  
-  
-  
 
   display(isSelected = false) {
     push();
@@ -747,7 +722,6 @@ class Cubie {
 }
 
 
-
 function updateLastHandPosition(wristPosition) {
   lastHandPosition = wristPosition;
 }
@@ -764,7 +738,7 @@ function controlCubeWithHand(landmarks) {
     const dy = wristY - lastHandPosition[1];
 
     // Scale hand movement for easyCam rotation
-    const rotationScale = 0.05; // Adjust sensitivity
+    const rotationScale = 0.05;
     easyCam.rotateY(-dx * rotationScale);
     easyCam.rotateX(-dy * rotationScale);
   }
@@ -772,13 +746,8 @@ function controlCubeWithHand(landmarks) {
   lastHandPosition = [wristX, wristY];
 }
 
-
-
-
 let selectedAxis = null; // Variable to store the selected axis
 let selectedLayer = 0; // Variable to store the selected row/column
-
-
 
 
 // Helper function to rotate the selected layer along the selected axis
