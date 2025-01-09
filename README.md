@@ -21,4 +21,6 @@ After camera is turned on and the application is loaded, user can immediately st
 
 ### Demo Video
 
-[Watch the demo video](demo.mp4)
+<video src="demo.mp4" controls="controls" style="max-width: 100%;">
+  Your browser does not support the video tag.
+</video>
