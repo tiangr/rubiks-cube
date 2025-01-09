@@ -21,6 +21,4 @@ After camera is turned on and the application is loaded, user can immediately st
 
 ### Demo Video
 
-<video src="demo.mp4" controls="controls" style="max-width: 100%;">
-  Your browser does not support the video tag.
-</video>
+[Download and Watch the Demo Video](https://github.com/tiangr/rubiks-cube/releases/tag/release/demo.mp4)
