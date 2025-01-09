@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rubik's Cube with MediaPipe Hand Detection</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+  <script src="https://unpkg.com/p5.easycam@1.0.1/p5.easycam.min.js"></script>
+  
+  <!-- Load MediaPipe Hands library -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
+  <!--mediapipe camera-->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cubejs/lib/cube.min.js"></script>
+
+
+
+
+<script src="rubiksCube.js"></script>
+<script src="sketch.js"></script>
+<script src="handDetection.js"></script>
+<style>
+  html, body {
+    overflow: hidden;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+</style>
+</head>
+<body>
+  <div id="loadingScreen" style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      z-index: 9999;">
+    Loading... Please wait.
+  </div>
+  <main>
+    <div style="text-align: center;">
+      <video id="videoElement" autoplay playsinline width="320" height="240" style="transform: scaleX(-1); position: absolute; top: 10px; left: 10px; z-index: 1;"></video>
+      <canvas id="videoCanvas" width="320" height="240" style="position: absolute; top: 10px; left: 10px; z-index: 2;"></canvas>
+    </div>
+  </main>
+</body>
+
+</html>
